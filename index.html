@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Strategic & Operations Management dashboard for Chief of Staff to track goals, costs, risks, and progress.">
+    <title>Strategic & Operations Management | Chief of Staff Portal</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core Stylesheet -->
+    <link rel="stylesheet" href="style.css?v=3">
+    
+    <!-- External UI Scripts (Chart.js & SheetJS) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <div class="brand-name">Strategic Ops</div>
+        </div>
+        
+        <ul class="nav-links">
+            <li>
+                <div class="nav-item active" data-tab="dashboard-tab">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Leadership Dashboard</span>
+                </div>
+            </li>
+            <li>
+                <div class="nav-item" data-tab="projects-tab">
+                    <i class="fas fa-list-check"></i>
+                    <span>Strategic Goals</span>
+                </div>
+            </li>
+            <li>
+                <div class="nav-item" data-tab="settings-tab">
+                    <i class="fas fa-file-import"></i>
+                    <span>Excel & Backups</span>
+                </div>
+            </li>
+            <li>
+                <div class="nav-item" data-tab="detailed-tab">
+                    <i class="fas fa-diagram-project"></i>
+                    <span>Detailed Overview</span>
+                </div>
+            </li>
+
+        </ul>
+        
+
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="main-content">
+        
+        <!-- Top Title Header -->
+        <header class="top-header">
+            <div class="header-title">
+                <h1 id="pageMainTitle">Strategic & Operations Management</h1>
+                <p>CXO Office Execution & Governance Cadence Dashboard</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-file-excel"></i> Import Sheet
+                </button>
+                <button class="btn btn-primary" onclick="openProjectModal()">
+                    <i class="fas fa-plus"></i> Add Project
+                </button>
+            </div>
+        </header>
+
+        <!-- TAB 1: EXECUTIVE DASHBOARD -->
+        <section id="dashboard-tab" class="tab-panel active">
+            
+            <!-- Executive Summary Text Box -->
+            <div class="summary-card">
+                <div class="summary-header">
+                    <h3><i class="fas fa-file-text text-primary"></i> Executive Summary Note</h3>
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <button type="button" class="regenerate-btn" id="regenerateSummaryBtn" title="Regenerate Summary Draft">
+                            <i class="fas fa-sync-alt"></i> Auto-Draft Summary
+                        </button>
+                        <div class="autosave-indicator" id="autosaveIndicator">
+                            <i class="fas fa-cloud-upload-alt"></i> Auto-saved to browser
+                        </div>
+                    </div>
+                </div>
+                <textarea class="summary-textarea" id="executiveSummaryText" placeholder="Write executive summary of active quarters or major status changes here..."></textarea>
+            </div>
+            
+            <!-- Key Performance Indicator Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fas fa-circle-notch fa-spin-slow"></i></div>
+                    <div class="metric-label">Weighted Progress</div>
+                    <div class="metric-value" id="kpiProgress">0%</div>
+                    <div class="metric-trend trend-neutral">
+                        <i class="fas fa-horizontal-rule"></i> Average Completion
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="color: var(--status-completed);"><i class="fas fa-wallet"></i></div>
+                    <div class="metric-label">Cost Implemented</div>
+                    <div class="metric-value" id="kpiCost">$0</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-check"></i> Outlay tracking
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="color: var(--status-delayed);"><i class="fas fa-shield-halved"></i></div>
+                    <div class="metric-label">Strategic Risks</div>
+                    <div class="metric-value" id="kpiRisks">0</div>
+                    <div class="metric-trend trend-down">
+                        <i class="fas fa-triangle-exclamation"></i> Require review
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="color: var(--status-atrisk);"><i class="fas fa-circle-nodes"></i></div>
+                    <div class="metric-label">Dependencies</div>
+                    <div class="metric-value" id="kpiDeps">0</div>
+                    <div class="metric-trend trend-neutral">
+                        <i class="fas fa-arrow-right"></i> Cross-functional
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Quick Stats -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Strategic Status Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="statusChartCanvas"></canvas>
+                    </div>
+                    
+                    <!-- Textual status breakdowns below the chart -->
+                    <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                            <span>On Track</span>
+                            <strong id="onTrackStatusPercent">0%</strong>
+                        </div>
+                        <div style="height:4px; background:var(--border-color); border-radius:2px; overflow:hidden;">
+                            <div id="onTrackStatusFill" style="height:100%; background:var(--status-ontrack); width:0%;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:0.25rem;">
+                            <span>At Risk</span>
+                            <strong id="atRiskStatusPercent">0%</strong>
+                        </div>
+                        <div style="height:4px; background:var(--border-color); border-radius:2px; overflow:hidden;">
+                            <div id="atRiskStatusFill" style="height:100%; background:var(--status-atrisk); width:0%;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:0.25rem;">
+                            <span>Delayed / Critical</span>
+                            <strong id="delayedStatusPercent">0%</strong>
+                        </div>
+                        <div style="height:4px; background:var(--border-color); border-radius:2px; overflow:hidden;">
+                            <div id="delayedStatusFill" style="height:100%; background:var(--status-delayed); width:0%;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:0.25rem;">
+                            <span>Completed</span>
+                            <strong id="completedStatusPercent">0%</strong>
+                        </div>
+                        <div style="height:4px; background:var(--border-color); border-radius:2px; overflow:hidden;">
+                            <div id="completedStatusFill" style="height:100%; background:var(--status-completed); width:0%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>Budget Allocation by Strategic Goal</h3>
+                    <div class="chart-container">
+                        <canvas id="costChartCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risks and Dependencies Highlights lists -->
+            <div class="highlights-grid">
+                <div class="highlights-card">
+                    <h3><i class="fas fa-triangle-exclamation" style="color: var(--status-delayed);"></i> High & Medium Strategic Risks</h3>
+                    <div class="highlight-list" id="dashboardRisks">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="highlights-card">
+                    <h3><i class="fas fa-circle-nodes" style="color: var(--status-completed);"></i> Dependencies & Resolved Solutions</h3>
+                    <div class="highlight-list" id="dashboardDeps">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- TAB 2: PROJECTS MANAGEMENT TABLE -->
+        <section id="projects-tab" class="tab-panel">
+            
+            <!-- Toolbar: search and filter options -->
+            <div class="project-toolbar">
+                <div class="search-filters">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="search-input" id="searchProject" placeholder="Search by project, lead, or goal...">
+                    </div>
+                    <select class="select-filter" id="filterGoal">
+                        <option value="all">All Strategic Goals</option>
+                    </select>
+                    <select class="select-filter" id="filterStatus">
+                        <option value="all">All Statuses</option>
+                        <option value="On Track">On Track</option>
+                        <option value="At Risk">At Risk</option>
+                        <option value="Delayed">Delayed</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Table showing all tracked projects -->
+            <div class="table-container">
+                <table class="projects-table" id="projectsTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-column="name">Project Name <span class="sort-icon" id="sort-icon-name"></span></th>
+                            <th class="sortable" data-column="goal">Strategic Goal <span class="sort-icon" id="sort-icon-goal"></span></th>
+                            <th class="sortable" data-column="progress">Progress (%) <span class="sort-icon" id="sort-icon-progress"></span></th>
+                            <th class="sortable" data-column="status">Status <span class="sort-icon" id="sort-icon-status"></span></th>
+                            <th class="sortable" data-column="cost">Cost <span class="sort-icon" id="sort-icon-cost"></span></th>
+                            <th class="sortable" data-column="owner">Owner <span class="sort-icon" id="sort-icon-owner"></span></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rendered by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+        </section>
+
+        <!-- TAB 3: DETAILED OVERVIEW (DEPENDENCY ACTUAL VS PLANNED) -->
+        <section id="detailed-tab" class="tab-panel">
+            <div class="detailed-grid" id="detailedOverviewGrid">
+                <!-- Project dependency cards will be populated here -->
+            </div>
+        </section>
+
+        <!-- TAB 4: IMPORT/EXPORT SETTINGS -->
+        <section id="settings-tab" class="tab-panel">
+            <div class="settings-grid">
+                
+                <!-- File Upload / Spreadsheet Import -->
+                <div class="settings-card">
+                    <h3><i class="fas fa-file-excel" style="color: #10b981;"></i> Excel / CSV Import</h3>
+                    <p class="settings-info">
+                        Quickly ingest multiple projects by uploading an Excel workbook or a CSV file. The columns must align to standard fields (e.g. Project Name, Goal, Progress (%), Status, Cost, Owner).
+                    </p>
+                    
+                    <div class="upload-zone" id="uploadZone">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                        <p>Drag & drop your workbook here, or <span>browse files</span></p>
+                        <p style="font-size:0.75rem; color:var(--text-muted);">Supports .xlsx, .xls, and .csv formats</p>
+                        <input type="file" class="file-input" id="fileInput" accept=".xlsx, .xls, .csv">
+                    </div>
+                    
+                    <button class="btn btn-secondary" id="downloadTemplateBtn">
+                        <i class="fas fa-download"></i> Download CSV Template
+                    </button>
+                </div>
+
+                <!-- State Backups & Local Data Portability -->
+                <div class="settings-card">
+                    <h3><i class="fas fa-database" style="color: var(--primary);"></i> Data Backup & Recovery</h3>
+                    <p class="settings-info">
+                        All project configurations and summary edits are auto-saved directly inside your browser cache. For compliance audits or system migrations, export the state as a backup JSON file or import a previous file.
+                    </p>
+                    
+                    <div class="settings-actions" style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <div style="display:flex; gap:0.5rem; width:100%;">
+                            <button class="btn btn-secondary" id="exportBackupBtn" style="flex:1;">
+                                <i class="fas fa-file-export"></i> Export Backup JSON
+                            </button>
+                            <button class="btn btn-secondary" id="importBackupBtn" style="flex:1;">
+                                <i class="fas fa-file-import"></i> Restore Backup JSON
+                            </button>
+                        </div>
+                        <button class="btn" id="resetDefaultsBtn" style="width:100%; background-color:#ef4444; color:white; border:none; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                            <i class="fas fa-rotate-left"></i> Reset Portfolio to Default Sample Data
+                        </button>
+                        <input type="file" id="backupFileInput" style="display:none;" accept=".json">
+                    </div>
+                    
+                    <div class="settings-info" style="border-top:1px solid var(--border-color); padding-top:1rem; margin-top:0.5rem; font-size:0.75rem;">
+                        <i class="fas fa-circle-info"></i> Re-importing a backup will overwrite existing local data.
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+
+
+    </main>
+
+    <!-- PROJECT DIALOG / MODAL FORM -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal-box">
+            <form id="projectForm">
+                <div class="modal-header" style="position:sticky; top:0; background:var(--bg-secondary); z-index:10; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; padding:1rem 1.5rem;">
+                    <h3 id="modalTitle" style="margin:0;">Add Strategic Project</h3>
+                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="addDepRowBtn" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                            <i class="fas fa-plus"></i> Add Dependency
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="cancelModalBtn">Cancel</button>
+                        <button class="modal-close" id="closeModalBtn" type="button" style="margin-left:0.5rem; background:none; border:none; color:var(--text-secondary); font-size:1.25rem; cursor:pointer;">&times;</button>
+                    </div>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="form-grid">
+                        
+                        <!-- Basic Info -->
+                        <div class="form-group full-width">
+                            <label class="form-label" for="projName">Project Name</label>
+                            <input type="text" class="form-input" id="projName" required placeholder="e.g. NextGen API Gateway">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="projGoal">Strategic Goal / Pillar</label>
+                            <input type="text" class="form-input" id="projGoal" required placeholder="e.g. Infrastructure Scaling" list="presetGoals">
+                            <datalist id="presetGoals">
+                                <option value="Wealth Management Expansion">
+                                <option value="Infrastructure Scaling">
+                                <option value="Regulatory Compliance">
+                                <option value="Major App Migration">
+                                <option value="Operations & Governance">
+                                </datalist>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="projOwner">Project Owner / Lead</label>
+                            <input type="text" class="form-input" id="projOwner" required placeholder="e.g. Sarah Jenkins">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="projStatus">Current Status</label>
+                            <select class="form-input" id="projStatus">
+                                <option value="On Track">On Track</option>
+                                <option value="At Risk">At Risk</option>
+                                <option value="Delayed">Delayed</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="projProgress">Progress (%)</label>
+                            <input type="number" class="form-input" id="projProgress" min="0" max="100" placeholder="0 - 100">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="projCost">Cost Implemented (USD)</label>
+                            <input type="number" class="form-input" id="projCost" min="0" placeholder="e.g. 150000">
+                        </div>
+                        
+                        <!-- Risks Section -->
+                        <div class="form-group full-width" style="border-top: 1px solid var(--border-color); padding-top:1rem; margin-top:0.5rem;">
+                            <label class="form-label" style="color:var(--status-delayed); font-weight:700;">Strategic Risk Assessment</label>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label" for="projRiskDesc">Risk Description</label>
+                            <textarea class="form-input form-textarea" id="projRiskDesc" placeholder="Describe key risk or blocker (leave empty if none)..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="projRiskImpact">Risk Impact Level</label>
+                            <select class="form-input" id="projRiskImpact">
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="projMitigation">Mitigation Plan</label>
+                            <input type="text" class="form-input" id="projMitigation" placeholder="Action item to handle this risk">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label" for="projRiskEta">Risk Resolution ETA</label>
+                            <input type="date" class="form-input" id="projRiskEta">
+                        </div>
+
+                        <!-- Dependencies Section -->
+                        <div class="form-group full-width" style="border-top: 1px solid var(--border-color); padding-top:1rem; margin-top:0.5rem;">
+                            <label class="form-label" style="color:var(--status-completed); font-weight:700; font-size:0.85rem;">Cross-Functional Dependencies & Milestones</label>
+                        </div>
+
+                        <div class="form-group full-width" id="modalDepsContainer" style="display:flex; flex-direction:column; gap:0.5rem;">
+                            <!-- Dynamic rows added here by script -->
+                        </div>
+
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Main Logic Script -->
+    <script src="app.js?v=3" defer></script>
+</body>
+</html>
