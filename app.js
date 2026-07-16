@@ -896,33 +896,57 @@ function initCharts() {
         type: 'bar',
         data: {
             labels: [],
-            datasets: [{
-                label: 'Cost Implemented ($)',
-                data: [],
-                backgroundColor: 'rgba(99, 102, 241, 0.75)',
-                hoverBackgroundColor: '#6366f1',
-                borderRadius: 4,
-                borderWidth: 0
-            }]
+            datasets: [
+                {
+                    label: 'Allocated Budget',
+                    data: [],
+                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                    hoverBackgroundColor: '#6366f1',
+                    borderRadius: 4,
+                    borderWidth: 0
+                },
+                {
+                    label: 'Actual Utilization',
+                    data: [],
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                    hoverBackgroundColor: '#10b981',
+                    borderRadius: 4,
+                    borderWidth: 0
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             indexAxis: 'y',
             plugins: {
-                legend: { display: false }
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#9ca3af',
+                        boxWidth: 12,
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
             },
             scales: {
                 x: {
                     grid: { display: false },
                     ticks: {
+                        color: '#9ca3af',
                         callback: function(value) {
                             return '$' + (value >= 1000 ? (value / 1000) + 'k' : value);
                         }
                     }
                 },
                 y: {
-                    grid: { display: false }
+                    grid: { display: false },
+                    ticks: {
+                        color: '#9ca3af'
+                    }
                 }
             }
         }
@@ -945,6 +969,7 @@ function renderDashboard() {
     let pendingDeps = 0;
 
     let costByGoal = {};
+    let utilByGoal = {};
     let riskList = [];
     let depList = [];
 
@@ -959,9 +984,14 @@ function renderDashboard() {
         totalProgress += parseFloat(p.progress || 0);
         totalCost += parseFloat(p.cost || 0);
 
-        // Goal Cost rollup
+        // Goal Cost & Utilization rollup
         const goal = p.goal || "General / Other";
-        costByGoal[goal] = (costByGoal[goal] || 0) + parseFloat(p.cost || 0);
+        const costVal = parseFloat(p.cost || 0);
+        const progressVal = parseFloat(p.progress || 0) / 100;
+        const utilVal = costVal * progressVal;
+
+        costByGoal[goal] = (costByGoal[goal] || 0) + costVal;
+        utilByGoal[goal] = (utilByGoal[goal] || 0) + utilVal;
 
         // Risks
         if (p.riskDesc && p.riskDesc.trim() !== "") {
@@ -1120,11 +1150,11 @@ function renderDashboard() {
     populateGoalFilters();
 
     // Trigger Charts Update
-    updateCharts(onTrackCount, atRiskCount, delayedCount, completedCount, costByGoal);
+    updateCharts(onTrackCount, atRiskCount, delayedCount, completedCount, costByGoal, utilByGoal);
 }
 
 // Update charts with fresh aggregated data
-function updateCharts(onTrack = 0, atRisk = 0, delayed = 0, completed = 0, costByGoal = {}) {
+function updateCharts(onTrack = 0, atRisk = 0, delayed = 0, completed = 0, costByGoal = {}, utilByGoal = {}) {
     if (typeof Chart === 'undefined' || !statusChart || !costChart) return;
 
     // Update doughnut data
@@ -1133,10 +1163,12 @@ function updateCharts(onTrack = 0, atRisk = 0, delayed = 0, completed = 0, costB
 
     // Prepare horizontal bar data
     const goals = Object.keys(costByGoal);
-    const costs = Object.values(costByGoal);
+    const costs = goals.map(g => costByGoal[g] || 0);
+    const utils = goals.map(g => utilByGoal[g] || 0);
 
     costChart.data.labels = goals;
     costChart.data.datasets[0].data = costs;
+    costChart.data.datasets[1].data = utils;
     costChart.update();
 }
 
