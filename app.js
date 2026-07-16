@@ -967,6 +967,7 @@ function renderDashboard() {
     let totalCost = 0;
     let activeRisks = 0;
     let pendingDeps = 0;
+    let totalOverrun = 0;
 
     let costByGoal = {};
     let utilByGoal = {};
@@ -983,6 +984,7 @@ function renderDashboard() {
         // Aggregations
         totalProgress += parseFloat(p.progress || 0);
         totalCost += parseFloat(p.cost || 0);
+        totalOverrun += calculateProjectOverrun(p);
 
         // Goal Cost & Utilization rollup
         const goal = p.goal || "General / Other";
@@ -1033,6 +1035,16 @@ function renderDashboard() {
     document.getElementById("kpiCost").innerText = formatCurrency(totalCost);
     document.getElementById("kpiRisks").innerText = activeRisks;
     document.getElementById("kpiDeps").innerText = pendingDeps;
+    document.getElementById("kpiOverrun").innerText = formatCurrency(totalOverrun);
+
+    const overrunTrend = document.getElementById("kpiOverrunTrend");
+    if (totalOverrun > 0) {
+        overrunTrend.className = "metric-trend trend-down";
+        overrunTrend.innerHTML = `<i class="fas fa-arrow-trend-up"></i> Cost variance risk`;
+    } else {
+        overrunTrend.className = "metric-trend trend-up";
+        overrunTrend.innerHTML = `<i class="fas fa-check"></i> On budget targets`;
+    }
 
     // Status bars updates
     const onTrackPercent = totalProjects > 0 ? Math.round((onTrackCount / totalProjects) * 100) : 0;
@@ -1606,6 +1618,11 @@ function renderProjectsTable(projectsList) {
         else if (p.status === "Delayed") progressColor = "var(--status-delayed)";
         else if (p.status === "Completed") progressColor = "var(--status-completed)";
 
+        const overrun = calculateProjectOverrun(p);
+        const overrunMarkup = overrun > 0 
+            ? `<div style="font-size:0.7rem; color:var(--status-delayed); font-weight:600; margin-top:0.15rem;"><i class="fas fa-arrow-trend-up"></i> +${formatCurrency(overrun)} est.</div>`
+            : `<div style="font-size:0.7rem; color:var(--status-ontrack); margin-top:0.15rem;"><i class="fas fa-check"></i> On budget</div>`;
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td class="td-project-name">${escapeHTML(p.name)}</td>
@@ -1619,7 +1636,10 @@ function renderProjectsTable(projectsList) {
                 </div>
             </td>
             <td><span class="status-badge ${statusClass}">${p.status}</span></td>
-            <td>${formatCurrency(p.cost)}</td>
+            <td>
+                <div>${formatCurrency(p.cost)}</div>
+                ${overrunMarkup}
+            </td>
             <td>${escapeHTML(p.owner)}</td>
             <td class="actions-cell">
                 <button class="action-btn" onclick="openProjectModal('${p.id}')" title="Edit Project"><i class="fas fa-edit"></i></button>
@@ -2120,4 +2140,31 @@ function escapeHTML(str) {
               .replace(/>/g, "&gt;")
               .replace(/"/g, "&quot;")
               .replace(/'/g, "&#039;");
+}
+
+function calculateProjectOverrun(p) {
+    let overrun = 0;
+    if (p.dependencies && p.dependencies.length > 0) {
+        let totalPlanned = 0;
+        let totalActual = 0;
+        p.dependencies.forEach(d => {
+            totalPlanned += parseInt(d.plannedProgress || 0);
+            totalActual += parseInt(d.actualProgress || 0);
+        });
+
+        if (totalPlanned > 0 && totalActual < totalPlanned) {
+            const spi = totalActual / totalPlanned;
+            if (spi > 0) {
+                const eac = parseFloat(p.cost || 0) / spi;
+                overrun = Math.max(0, eac - parseFloat(p.cost || 0));
+            } else {
+                overrun = parseFloat(p.cost || 0);
+            }
+        }
+    } else if (p.status === "Delayed") {
+        overrun = parseFloat(p.cost || 0) * 0.20;
+    } else if (p.status === "At Risk") {
+        overrun = parseFloat(p.cost || 0) * 0.10;
+    }
+    return Math.round(overrun);
 }
