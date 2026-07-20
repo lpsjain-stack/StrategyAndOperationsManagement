@@ -2663,9 +2663,33 @@ function renderNewsletterTab() {
 
                 ${activeSectionEditing === 'sec1' ? `
                     <div class="newsletter-edit-box">
-                        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.35rem;">Editing Section 1 Content:</div>
-                        <textarea id="edit_sec1" class="newsletter-textarea">${escapeHTML(custom.sec1 || "Handled a record 12,500 OPS during post-budget market opening on June 15. Core OMS processed all orders smoothly without queue backlog.\nLatency Optimization: Optimized Redis caching layers, cutting P99 order placement latency by 1.8ms across mobile and web platforms.")}</textarea>
-                        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end;">
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.75rem;">
+                            <i class="fas fa-table"></i> Edit Section 1 Metrics & Text Bullets:
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem; margin-bottom:1rem;">
+                            <div>
+                                <label class="form-label" style="font-size:0.7rem;">Peak Orders Per Second (OPS)</label>
+                                <input type="text" id="edit_sec1_ops" class="form-input" value="${escapeHTML(custom.sec1_ops || '12,500')}">
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size:0.7rem;">Order Execution Latency (P99)</label>
+                                <input type="text" id="edit_sec1_latency" class="form-input" value="${escapeHTML(custom.sec1_latency || '11.2ms')}">
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size:0.7rem;">API Gateway Availability</label>
+                                <input type="text" id="edit_sec1_availability" class="form-input" value="${escapeHTML(custom.sec1_availability || '99.992%')}">
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size:0.7rem;">SmartAPI Error Rate</label>
+                                <input type="text" id="edit_sec1_errorRate" class="form-input" value="${escapeHTML(custom.sec1_errorRate || '0.021%')}">
+                            </div>
+                        </div>
+
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:0.25rem;">Section Bullet Points:</div>
+                        <textarea id="edit_sec1" class="newsletter-textarea">${escapeHTML(custom.sec1 || "Peak Load Handling: Handled a record 12,500 OPS during the post-budget market opening on June 15. The core order management system (OMS) processed all orders smoothly without any queue backlog.\nLatency Optimization: Optimized our Redis caching layers, which cut P99 order placement latency by 1.8ms across all mobile and web platforms.")}</textarea>
+                        
+                        <div style="display:flex; gap:0.5rem; margin-top:0.75rem; justify-content:flex-end;">
                             <button class="btn btn-primary" onclick="saveNewsletterSection('sec1')" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-floppy-disk"></i> 💾 Save Section</button>
                             <button class="btn btn-secondary" onclick="cancelEditNewsletterSection()" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-xmark"></i> ✖ Cancel</button>
                         </div>
@@ -2688,25 +2712,25 @@ function renderNewsletterTab() {
                             <tr>
                                 <td><strong>Peak Orders Per Second (OPS)</strong></td>
                                 <td>—</td>
-                                <td><strong style="color:var(--text-primary);">12,500</strong></td>
+                                <td><strong style="color:var(--text-primary);">${escapeHTML(custom.sec1_ops || '12,500')}</strong></td>
                                 <td><span class="status-badge status-completed" style="font-size:0.7rem;">🚀 Record High</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Order Execution Latency (P99)</strong></td>
                                 <td>&lt; 15ms</td>
-                                <td><strong style="color:var(--status-ontrack);">11.2ms</strong></td>
+                                <td><strong style="color:var(--status-ontrack);">${escapeHTML(custom.sec1_latency || '11.2ms')}</strong></td>
                                 <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
                             </tr>
                             <tr>
                                 <td><strong>API Gateway Availability</strong></td>
                                 <td>99.99%</td>
-                                <td><strong style="color:var(--status-ontrack);">99.992%</strong></td>
+                                <td><strong style="color:var(--status-ontrack);">${escapeHTML(custom.sec1_availability || '99.992%')}</strong></td>
                                 <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
                             </tr>
                             <tr>
                                 <td><strong>SmartAPI Error Rate</strong></td>
                                 <td>&lt; 0.05%</td>
-                                <td><strong style="color:var(--status-ontrack);">0.021%</strong></td>
+                                <td><strong style="color:var(--status-ontrack);">${escapeHTML(custom.sec1_errorRate || '0.021%')}</strong></td>
                                 <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
                             </tr>
                         </tbody>
@@ -3000,13 +3024,25 @@ window.editNewsletterSection = function(secId) {
 };
 
 window.saveNewsletterSection = function(secId) {
+    appState.customNewsletterSections = appState.customNewsletterSections || {};
     const textarea = document.getElementById(`edit_${secId}`);
     if (textarea) {
-        appState.customNewsletterSections = appState.customNewsletterSections || {};
         appState.customNewsletterSections[secId] = textarea.value;
-        saveState();
-        showToast("Section updated and saved.", "success");
     }
+
+    if (secId === 'sec1') {
+        const ops = document.getElementById("edit_sec1_ops");
+        const lat = document.getElementById("edit_sec1_latency");
+        const avail = document.getElementById("edit_sec1_availability");
+        const err = document.getElementById("edit_sec1_errorRate");
+        if (ops) appState.customNewsletterSections.sec1_ops = ops.value.trim();
+        if (lat) appState.customNewsletterSections.sec1_latency = lat.value.trim();
+        if (avail) appState.customNewsletterSections.sec1_availability = avail.value.trim();
+        if (err) appState.customNewsletterSections.sec1_errorRate = err.value.trim();
+    }
+
+    saveState();
+    showToast("Section updated and saved.", "success");
     activeSectionEditing = null;
     renderNewsletterTab();
 };
