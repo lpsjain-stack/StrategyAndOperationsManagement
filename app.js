@@ -695,6 +695,8 @@ function setupEventListeners() {
                 renderDashboard();
             } else if (tabId === "detailed-tab") {
                 renderDetailedOverview();
+            } else if (tabId === "aop-tab") {
+                renderAopTab();
             }
         });
     });
@@ -2168,3 +2170,370 @@ function calculateProjectOverrun(p) {
     }
     return Math.round(overrun);
 }
+
+// AOP & Quarterly Planning Tab Logic & Compiler
+let currentQuarterFilter = "Q1";
+
+function renderAopTab() {
+    const container = document.getElementById("aop-tab");
+    if (!container) return;
+
+    // Calculate rolled up achievement from active projects
+    const totalProjects = appState.projects.length;
+    let avgProgress = 0;
+    if (totalProjects > 0) {
+        const sumProg = appState.projects.reduce((acc, p) => acc + (parseFloat(p.progress) || 0), 0);
+        avgProgress = Math.round(sumProg / totalProjects);
+    }
+
+    // AOP Financial & Operational Driver Model
+    const aopData = {
+        revTarget: "$15.00M",
+        revActual: "$9.75M",
+        revAchievedPercent: 65,
+        burnRate: "$350,000 / mo",
+        runway: "18 Months",
+        settlementReserve: "$1.20M",
+        compBudget: "$650,000",
+        compSpent: "$420,000",
+        compPercent: 64.6
+    };
+
+    // Quarterly OKR Execution Sprints Data
+    const quarterlySprints = {
+        "Q1": {
+            quarterName: "Q1 Execution Sprint",
+            objective: "Secure NBFC lending license & launch BNPL checkout flow to lower cart abandonment.",
+            keyResults: [
+                { desc: "Increase checkout conversion rate from 75% to 85%", target: "85%", actual: "82%", status: "On Track", percent: 82 },
+                { desc: "Clear Phase-2 regulatory & NBFC licensing audits by end of Month 2", target: "100%", actual: "100%", status: "Completed", percent: 100 }
+            ],
+            productTheme: "Deploy Buy-Now-Pay-Later (BNPL) to Tier-1 merchants (Linked: Wealth Management Integration)",
+            engineeringTheme: "Refactor legacy payment gateway for 99.99% high-availability uptime (Linked: Cloud Infra Auto-scaling)",
+            securityTheme: "Implement real-time fraud detection using AI transaction monitoring (Linked: Fintech Regulatory Audit)",
+            capacityHours: "4,500 Hrs",
+            allocatedHours: "4,200 Hrs",
+            techDebtPercent: "20% (Infra & Refactoring)",
+            fpaCadence: "Bi-weekly FP&A Review: Revenue & Expenses matched against AOP forecasts (Status: On Track)",
+            steerCoCadence: "Monthly Steer-Co: Roadmap adjustments & bandwidth reallocation (Status: Completed)"
+        },
+        "Q2": {
+            quarterName: "Q2 Execution Sprint",
+            objective: "Scale cloud infrastructure for festive trading surges & automate AML transaction monitoring.",
+            keyResults: [
+                { desc: "Achieve 50,000 TPS festive surge benchmark in staging tests", target: "50k TPS", actual: "45k TPS", status: "On Track", percent: 90 },
+                { desc: "Automate AML transaction monitoring to cover 99% of digital flows", target: "99%", actual: "94.5%", status: "On Track", percent: 95 }
+            ],
+            productTheme: "Launch automated KYC instant onboarding flow with Sumsub & Onfido tooling",
+            engineeringTheme: "Deploy high-throughput Redis rate limiters & PostgreSQL indexing optimization",
+            securityTheme: "Conduct external penetration testing & SOC2 Type II compliance audit",
+            capacityHours: "4,800 Hrs",
+            allocatedHours: "4,600 Hrs",
+            techDebtPercent: "22% (Performance Tuning)",
+            fpaCadence: "Bi-weekly FP&A Review: Cloud infrastructure cost vs unit economics (Status: On Track)",
+            steerCoCadence: "Monthly Steer-Co: Q2 Mid-quarter re-forecasting & risk mitigations (Status: On Track)"
+        },
+        "Q3": {
+            quarterName: "Q3 Execution Sprint",
+            objective: "Expand Wealth Management robo-advisory & integrate clearing house APIs.",
+            keyResults: [
+                { desc: "Integrate multi-currency core ledger API for broker executions", target: "100%", actual: "60%", status: "At Risk", percent: 60 },
+                { desc: "Scale robo-advisory active AUM to $50M", target: "$50M", actual: "$32M", status: "On Track", percent: 64 }
+            ],
+            productTheme: "Deliver robo-advisory portfolio rebalancing & analytics dashboard",
+            engineeringTheme: "Integrate clearing house connectivity API & Securities filing audit",
+            securityTheme: "Deploy external API gateway firewall & Zero-Trust network rules",
+            capacityHours: "5,000 Hrs",
+            allocatedHours: "4,850 Hrs",
+            techDebtPercent: "18% (API Gateway Refactoring)",
+            fpaCadence: "Bi-weekly FP&A Review: Brokerage commissions & clearing fees (Status: In Review)",
+            steerCoCadence: "Monthly Steer-Co: Product roadmap prioritization & vendor approvals (Status: Scheduled)"
+        },
+        "Q4": {
+            quarterName: "Q4 Execution Sprint",
+            objective: "Refactor core ledger database for multi-currency settlement & pass global SecOps audit.",
+            keyResults: [
+                { desc: "Achieve 99.99% annual uptime SLA across core payment gateway", target: "99.99%", actual: "99.96%", status: "On Track", percent: 96 },
+                { desc: "Complete Annual ISO27001 & Regulatory Compliance filings", target: "4 Filings", actual: "3 Filings", status: "On Track", percent: 75 }
+            ],
+            productTheme: "Roll out multi-currency digital wallet & enterprise vendor portal",
+            engineeringTheme: "Complete Logstash audit trail & multi-region database replication",
+            securityTheme: "Finalize annual SecOps audit signoffs & board governance decks",
+            capacityHours: "5,200 Hrs",
+            allocatedHours: "4,900 Hrs",
+            techDebtPercent: "20% (Core Ledger Refactoring)",
+            fpaCadence: "Bi-weekly FP&A Review: Annual AOP budget variance & next year target prep",
+            steerCoCadence: "Monthly Steer-Co: Annual strategy review & executive compensation alignment"
+        }
+    };
+
+    const currentSprint = quarterlySprints[currentQuarterFilter] || quarterlySprints["Q1"];
+
+    container.innerHTML = `
+        <!-- Top AOP Financial & Operational Blueprint Banner -->
+        <div class="aop-banner">
+            <div class="aop-banner-header">
+                <div class="aop-banner-title">
+                    <h2><i class="fas fa-chart-line text-primary"></i> Annual Operating Plan (AOP) Blueprint</h2>
+                    <p>Fintech Strategic Financial Alignment, Cash Flow & Unit Economics (12-Month Horizon)</p>
+                </div>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <span class="status-badge status-ontrack" style="font-size:0.75rem; padding:0.35rem 0.75rem;">
+                        <i class="fas fa-check-circle"></i> AOP Active • ${avgProgress}% Project Portfolio Met
+                    </span>
+                </div>
+            </div>
+            
+            <div class="aop-metrics-row">
+                <div class="aop-metric-box">
+                    <span class="aop-metric-lbl">Driver-Based Revenue Target</span>
+                    <span class="aop-metric-val">${aopData.revTarget}</span>
+                    <span class="aop-metric-sub" style="color:var(--status-ontrack);">
+                        <i class="fas fa-arrow-trend-up"></i> ${aopData.revActual} Achieved (${aopData.revAchievedPercent}%)
+                    </span>
+                </div>
+                <div class="aop-metric-box">
+                    <span class="aop-metric-lbl">Capital & Cash Plan</span>
+                    <span class="aop-metric-val">${aopData.burnRate}</span>
+                    <span class="aop-metric-sub">
+                        <i class="fas fa-shield"></i> Runway: <strong>${aopData.runway}</strong> (Reserves: ${aopData.settlementReserve})
+                    </span>
+                </div>
+                <div class="aop-metric-box">
+                    <span class="aop-metric-lbl">Regulatory & Compliance Budget</span>
+                    <span class="aop-metric-val">${aopData.compBudget}</span>
+                    <span class="aop-metric-sub" style="color:#93c5fd;">
+                        <i class="fas fa-wallet"></i> Spent: ${aopData.compSpent} (${aopData.compPercent}%)
+                    </span>
+                </div>
+                <div class="aop-metric-box">
+                    <span class="aop-metric-lbl">AOP Target Achievement</span>
+                    <span class="aop-metric-val">${avgProgress}%</span>
+                    <span class="aop-metric-sub" style="color:var(--primary);">
+                        <i class="fas fa-tasks"></i> Rolled up from ${totalProjects} Active Projects
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categorized Quantifiable KPI Clusters -->
+        <h3 class="aop-section-title"><i class="fas fa-gauge-high text-primary"></i> Quantifiable Driver & Operational KPIs</h3>
+        
+        <div class="aop-kpi-grid">
+            <!-- Revenue & Driver KPIs -->
+            <div class="aop-kpi-card">
+                <div class="aop-kpi-card-header">
+                    <h4><i class="fas fa-sack-dollar text-primary"></i> Revenue & Unit Economics</h4>
+                    <span class="status-badge status-ontrack" style="font-size:0.65rem;">Bottom-up Model</span>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">Monthly Active Users (MAUs)</span>
+                        <span class="aop-kpi-values">Target: 2.50M | <strong>Actual: 1.85M</strong></span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 74%; background: var(--status-ontrack); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">Gross Transaction Volume (GTV)</span>
+                        <span class="aop-kpi-values">Target: $450M | <strong>Actual: $315M</strong></span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 70%; background: var(--status-ontrack); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">Take Rate (bps) & LTV/CAC</span>
+                        <span class="aop-kpi-values">Take: <strong>42 bps</strong> (45 target) | LTV/CAC: <strong>8.0x</strong></span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 93%; background: var(--primary); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">Checkout Conversion Rate</span>
+                        <span class="aop-kpi-values">Original: 75% | <strong>Actual: 82%</strong> (Target 85%)</span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 82%; background: var(--status-ontrack); height:100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance & Regulatory KPIs -->
+            <div class="aop-kpi-card">
+                <div class="aop-kpi-card-header">
+                    <h4><i class="fas fa-shield-halved text-primary"></i> Regulatory & Compliance KPIs</h4>
+                    <span class="status-badge status-completed" style="font-size:0.65rem;">Audit & Control</span>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">NBFC Phase-2 Licensing Audit</span>
+                        <span class="aop-kpi-values">Target: 100% | <strong>Cleared & Approved</strong></span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 100%; background: var(--status-completed); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">AI Real-Time Fraud Monitoring</span>
+                        <span class="aop-kpi-values">Target: 99.0% tx | <strong>Actual: 94.5%</strong></span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 95%; background: var(--status-ontrack); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">KYC/AML Automated Verify Time</span>
+                        <span class="aop-kpi-values">Sumsub/Onfido: <strong>42 Seconds</strong> (Target <60s)</span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 90%; background: var(--status-ontrack); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">Regulatory Audit Sign-offs</span>
+                        <span class="aop-kpi-values">Filings: <strong>3 / 4 Cleared</strong> (75% Complete)</span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 75%; background: var(--status-atrisk); height:100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical & Infrastructure KPIs -->
+            <div class="aop-kpi-card">
+                <div class="aop-kpi-card-header">
+                    <h4><i class="fas fa-server text-primary"></i> Technical Quantifiable KPIs</h4>
+                    <span class="status-badge status-ontrack" style="font-size:0.65rem;">Engineering & SLA</span>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">Core Gateway Uptime SLA</span>
+                        <span class="aop-kpi-values">Target: 99.99% | <strong>Actual: 99.96%</strong></span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 96%; background: var(--status-ontrack); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">API Gateway Latency</span>
+                        <span class="aop-kpi-values">Target: <45ms | <strong>Actual: 38ms</strong> (Passed)</span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 100%; background: var(--status-completed); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">Tech Debt Sprint Allocation</span>
+                        <span class="aop-kpi-values">Target: 20.0% | <strong>Actual: 18.5% Bandwidth</strong></span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 92%; background: var(--primary); height:100%;"></div>
+                    </div>
+                </div>
+                <div class="aop-kpi-item">
+                    <div class="aop-kpi-item-row">
+                        <span class="aop-kpi-name">High-Volume Festive Load Test</span>
+                        <span class="aop-kpi-values">Target: 50,000 TPS | <strong>Actual: 45,000 TPS</strong></span>
+                    </div>
+                    <div style="height: 5px; background: var(--border-color); border-radius: 3px; overflow:hidden;">
+                        <div style="width: 90%; background: var(--status-ontrack); height:100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quarterly Execution Sprints (90-Day Execution Template) -->
+        <h3 class="aop-section-title"><i class="fas fa-cubes text-primary"></i> Quarterly Planning Template (90-Day Execution Sprints)</h3>
+
+        <div class="quarterly-sprint-container">
+            <!-- Selector Pills -->
+            <div class="quarterly-pill-bar">
+                <button class="quarterly-pill ${currentQuarterFilter === 'Q1' ? 'active' : ''}" onclick="switchQuarter('Q1')">Q1 Execution Sprint</button>
+                <button class="quarterly-pill ${currentQuarterFilter === 'Q2' ? 'active' : ''}" onclick="switchQuarter('Q2')">Q2 Execution Sprint</button>
+                <button class="quarterly-pill ${currentQuarterFilter === 'Q3' ? 'active' : ''}" onclick="switchQuarter('Q3')">Q3 Execution Sprint</button>
+                <button class="quarterly-pill ${currentQuarterFilter === 'Q4' ? 'active' : ''}" onclick="switchQuarter('Q4')">Q4 Execution Sprint</button>
+            </div>
+
+            <!-- Objectives & Key Results Block -->
+            <div class="okr-block">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--primary); font-weight:700;">1. Quarterly Objective (OKR)</span>
+                    <span class="status-badge status-ontrack" style="font-size:0.7rem;">${currentSprint.quarterName}</span>
+                </div>
+                <div class="okr-title">${currentSprint.objective}</div>
+
+                <div class="okr-key-results">
+                    ${currentSprint.keyResults.map(kr => `
+                        <div class="kr-item">
+                            <i class="fas fa-check-circle" style="color:${kr.percent === 100 ? 'var(--status-completed)' : (kr.percent < 70 ? 'var(--status-atrisk)' : 'var(--status-ontrack)')};"></i>
+                            <span style="flex:1;"><strong>Key Result:</strong> ${kr.desc}</span>
+                            <span style="font-weight:700; color:var(--text-primary); margin-left:1rem;">${kr.actual}</span>
+                            <span class="status-badge ${kr.percent === 100 ? 'status-completed' : (kr.percent < 70 ? 'status-atrisk' : 'status-ontrack')}" style="font-size:0.65rem; padding:0.1rem 0.4rem;">
+                                ${kr.status} (${kr.percent}%)
+                            </span>
+                        </div>
+                    `).join("")}
+                </div>
+            </div>
+
+            <!-- Core Themes & Initiatives Grid -->
+            <div style="font-size:0.85rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">
+                2. Core Themes & Initiatives
+            </div>
+            <div class="themes-grid">
+                <div class="theme-card">
+                    <h5><i class="fas fa-box text-primary"></i> Product Initiative</h5>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0; line-height:1.4;">${currentSprint.productTheme}</p>
+                </div>
+                <div class="theme-card">
+                    <h5><i class="fas fa-code text-primary"></i> Engineering Initiative</h5>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0; line-height:1.4;">${currentSprint.engineeringTheme}</p>
+                </div>
+                <div class="theme-card">
+                    <h5><i class="fas fa-lock text-primary"></i> Security & Compliance</h5>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0; line-height:1.4;">${currentSprint.securityTheme}</p>
+                </div>
+            </div>
+
+            <!-- Resource Allocation & Tech Debt -->
+            <div style="font-size:0.85rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">
+                3. Resource Allocation & Tech Debt Capacity
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.25rem; margin-bottom:1.5rem;">
+                <div style="background-color:rgba(0,0,0,0.15); padding:0.85rem; border-radius:0.5rem; border:1px solid var(--border-color); font-size:0.8rem;">
+                    <div style="color:var(--text-muted); margin-bottom:0.25rem;">Cross-Functional Engineering Hours</div>
+                    <div style="font-size:1.1rem; font-weight:800; color:var(--text-primary);">${currentSprint.allocatedHours} <span style="font-size:0.8rem; font-weight:normal; color:var(--text-secondary);">/ ${currentSprint.capacityHours} Capacity</span></div>
+                </div>
+                <div style="background-color:rgba(0,0,0,0.15); padding:0.85rem; border-radius:0.5rem; border:1px solid var(--border-color); font-size:0.8rem;">
+                    <div style="color:var(--text-muted); margin-bottom:0.25rem;">Infrastructure Scaling & Tech Debt</div>
+                    <div style="font-size:1.1rem; font-weight:800; color:var(--status-ontrack);">${currentSprint.techDebtPercent}</div>
+                </div>
+            </div>
+
+            <!-- Tracking & Execution Cadence -->
+            <div style="font-size:0.85rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">
+                4. Governance & Execution Cadence
+            </div>
+            <div class="cadence-bar">
+                <div><strong style="color:var(--primary);"><i class="fas fa-calendar-week"></i> Bi-weekly FP&A Review:</strong> ${currentSprint.fpaCadence}</div>
+                <div><strong style="color:var(--status-completed);"><i class="fas fa-users-gear"></i> Monthly Steer-Co:</strong> ${currentSprint.steerCoCadence}</div>
+            </div>
+        </div>
+    `;
+}
+
+window.switchQuarter = function(qId) {
+    currentQuarterFilter = qId;
+    renderAopTab();
+};
