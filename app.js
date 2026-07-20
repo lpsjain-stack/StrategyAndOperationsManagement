@@ -1237,6 +1237,7 @@ function renderDetailedOverview() {
 
         const card = document.createElement("div");
         card.className = "detailed-card";
+        card.id = `project-card-${p.id}`;
         
         let depsRowsHTML = "";
         let hasDeps = p.dependencies && p.dependencies.length > 0;
@@ -2273,6 +2274,20 @@ function renderAopTab() {
 
     const currentSprint = quarterlySprints[currentQuarterFilter] || quarterlySprints["Q1"];
 
+    // Find linked projects from live appState.projects
+    const p1 = appState.projects.find(p => p.id === "p1" || p.name.includes("Wealth")) || appState.projects[0];
+    const p2 = appState.projects.find(p => p.id === "p2" || p.name.includes("Cloud")) || appState.projects[1];
+    const p3 = appState.projects.find(p => p.id === "p3" || p.name.includes("Compliance")) || appState.projects[2];
+    const p4 = appState.projects.find(p => p.id === "p4" || p.name.includes("Migration") || p.name.includes("NextGen")) || appState.projects[3];
+
+    // Helper for status badge class
+    function getStatusBadgeClass(st) {
+        if (st === "At Risk") return "status-atrisk";
+        if (st === "Delayed") return "status-delayed";
+        if (st === "Completed") return "status-completed";
+        return "status-ontrack";
+    }
+
     container.innerHTML = `
         <!-- Top AOP Financial & Operational Blueprint Banner -->
         <div class="aop-banner">
@@ -2493,20 +2508,53 @@ function renderAopTab() {
 
             <!-- Core Themes & Initiatives Grid -->
             <div style="font-size:0.85rem; font-weight:700; color:var(--text-primary); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">
-                2. Core Themes & Initiatives
+                2. Core Themes & Linked Strategic Projects
             </div>
             <div class="themes-grid">
                 <div class="theme-card">
                     <h5><i class="fas fa-box text-primary"></i> Product Initiative</h5>
-                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0; line-height:1.4;">${currentSprint.productTheme}</p>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 0.5rem 0; line-height:1.4;">${currentSprint.productTheme}</p>
+                    ${p1 ? `
+                        <div style="border-top:1px solid var(--border-color); padding-top:0.5rem; margin-top:0.5rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem;">
+                                <span style="font-weight:700; color:var(--text-primary);">${escapeHTML(p1.name)}</span>
+                                <span class="status-badge ${getStatusBadgeClass(p1.status)}" style="font-size:0.65rem;">${p1.status} (${p1.progress}%)</span>
+                            </div>
+                            <button class="project-link-chip" onclick="navigateToProject('${p1.id}')">
+                                <i class="fas fa-arrow-right-to-bracket"></i> View Linked Project Details
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="theme-card">
                     <h5><i class="fas fa-code text-primary"></i> Engineering Initiative</h5>
-                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0; line-height:1.4;">${currentSprint.engineeringTheme}</p>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 0.5rem 0; line-height:1.4;">${currentSprint.engineeringTheme}</p>
+                    ${p2 ? `
+                        <div style="border-top:1px solid var(--border-color); padding-top:0.5rem; margin-top:0.5rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem;">
+                                <span style="font-weight:700; color:var(--text-primary);">${escapeHTML(p2.name)}</span>
+                                <span class="status-badge ${getStatusBadgeClass(p2.status)}" style="font-size:0.65rem;">${p2.status} (${p2.progress}%)</span>
+                            </div>
+                            <button class="project-link-chip" onclick="navigateToProject('${p2.id}')">
+                                <i class="fas fa-arrow-right-to-bracket"></i> View Linked Project Details
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="theme-card">
                     <h5><i class="fas fa-lock text-primary"></i> Security & Compliance</h5>
-                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0; line-height:1.4;">${currentSprint.securityTheme}</p>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 0.5rem 0; line-height:1.4;">${currentSprint.securityTheme}</p>
+                    ${p3 ? `
+                        <div style="border-top:1px solid var(--border-color); padding-top:0.5rem; margin-top:0.5rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem;">
+                                <span style="font-weight:700; color:var(--text-primary);">${escapeHTML(p3.name)}</span>
+                                <span class="status-badge ${getStatusBadgeClass(p3.status)}" style="font-size:0.65rem;">${p3.status} (${p3.progress}%)</span>
+                            </div>
+                            <button class="project-link-chip" onclick="navigateToProject('${p3.id}')">
+                                <i class="fas fa-arrow-right-to-bracket"></i> View Linked Project Details
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
 
@@ -2546,6 +2594,11 @@ window.switchQuarter = function(qId) {
 function renderNewsletterTab() {
     const container = document.getElementById("newsletter-tab");
     if (!container) return;
+
+    // Find live linked projects
+    const p1 = appState.projects.find(p => p.id === "p1" || p.name.includes("Wealth")) || appState.projects[0];
+    const p2 = appState.projects.find(p => p.id === "p2" || p.name.includes("Cloud")) || appState.projects[1];
+    const p3 = appState.projects.find(p => p.id === "p3" || p.name.includes("Compliance")) || appState.projects[2];
 
     container.innerHTML = `
         <div class="newsletter-wrapper">
@@ -2626,6 +2679,14 @@ function renderNewsletterTab() {
                     <li><strong>Peak Load Handling:</strong> Handled a record 12,500 OPS during the post-budget market opening on June 15. The core order management system (OMS) processed all orders smoothly without any queue backlog.</li>
                     <li><strong>Latency Optimization:</strong> Optimized our Redis caching layers, which cut P99 order placement latency by 1.8ms across all mobile and web platforms.</li>
                 </ul>
+
+                ${p2 ? `
+                    <div style="margin-top:0.75rem;">
+                        <button class="project-link-chip" onclick="navigateToProject('${p2.id}')">
+                            <i class="fas fa-link"></i> Live Project Driver: ${escapeHTML(p2.name)} (${p2.progress}% Complete • ${p2.status})
+                        </button>
+                    </div>
+                ` : ''}
             </div>
 
             <!-- Section 2: Infrastructure Scale & Cloud Cost Optimization -->
@@ -2649,6 +2710,14 @@ function renderNewsletterTab() {
                         <div style="width:82%; background:linear-gradient(90deg, var(--primary), var(--status-ontrack)); height:100%;"></div>
                     </div>
                 </div>
+
+                ${p2 ? `
+                    <div style="margin-top:0.75rem;">
+                        <button class="project-link-chip" onclick="navigateToProject('${p2.id}')">
+                            <i class="fas fa-link"></i> Live Project Driver: ${escapeHTML(p2.name)} (${p2.progress}% Complete • ${p2.status})
+                        </button>
+                    </div>
+                ` : ''}
             </div>
 
             <!-- Section 3: Engineering Velocity & DevOps -->
@@ -2688,6 +2757,14 @@ function renderNewsletterTab() {
                     <li><strong>SEBI Cyber Security Framework:</strong> Patched and updated all internet-facing APIs to meet the new SEBI guidelines for multi-factor authentication (MFA) on third-party integrations.</li>
                     <li><strong>Vulnerability Management:</strong> Completed our monthly automated VPTA (Vulnerability Assessment and Penetration Testing) scan. Critical bugs found: <strong>0</strong>; Medium risk bugs found: <strong>3</strong> (all 3 are already patched).</li>
                 </ul>
+
+                ${p3 ? `
+                    <div style="margin-top:0.75rem;">
+                        <button class="project-link-chip" onclick="navigateToProject('${p3.id}')">
+                            <i class="fas fa-link"></i> Live Project Driver: ${escapeHTML(p3.name)} (${p3.progress}% Complete • ${p3.status})
+                        </button>
+                    </div>
+                ` : ''}
             </div>
 
             <!-- Section 5: Data Engineering & AI Initiatives -->
@@ -2713,6 +2790,14 @@ function renderNewsletterTab() {
                         <strong style="color:var(--status-delayed);"><i class="fas fa-thumbtack"></i> Action Item:</strong> We need to accelerate our project to integrate a third backup bank gateway by next month to spread out the transaction load.
                     </div>
                 </div>
+
+                ${p1 ? `
+                    <div style="margin-top:0.75rem;">
+                        <button class="project-link-chip" onclick="navigateToProject('${p1.id}')" style="border-color:rgba(239, 68, 68, 0.4); color:#fca5a5;">
+                            <i class="fas fa-triangle-exclamation"></i> Live Risk Project: ${escapeHTML(p1.name)} (${p1.progress}% Complete • ${p1.status})
+                        </button>
+                    </div>
+                ` : ''}
             </div>
 
             <!-- Section 7: CTO Customization & Feedback Callout -->
@@ -2746,4 +2831,28 @@ function renderNewsletterTab() {
 
 window.submitNewsletterFeedback = function() {
     alert("Feedback saved! The Engineering Excellence & Architecture Group will customize next month's update accordingly.");
+};
+
+// Global Cross-Tab Project Jump Navigation Handler
+window.navigateToProject = function(projectId) {
+    const navItems = document.querySelectorAll(".nav-item[data-tab]");
+    navItems.forEach(i => i.classList.remove("active"));
+    const detailedNavItem = document.querySelector('.nav-item[data-tab="detailed-tab"]');
+    if (detailedNavItem) detailedNavItem.classList.add("active");
+
+    document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+    const detailedPanel = document.getElementById("detailed-tab");
+    if (detailedPanel) detailedPanel.classList.add("active");
+
+    renderDetailedOverview();
+
+    setTimeout(() => {
+        const cardElem = document.getElementById(`project-card-${projectId}`);
+        if (cardElem) {
+            cardElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            cardElem.classList.remove('project-card-highlight');
+            void cardElem.offsetWidth; // trigger reflow
+            cardElem.classList.add('project-card-highlight');
+        }
+    }, 100);
 };
