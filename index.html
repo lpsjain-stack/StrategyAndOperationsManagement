@@ -33,7 +33,13 @@
         
         <ul class="nav-links">
             <li>
-                <div class="nav-item active" data-tab="dashboard-tab">
+                <div class="nav-item active" data-tab="aop-tab">
+                    <i class="fas fa-bullseye"></i>
+                    <span>AOP & Quarterly Plan</span>
+                </div>
+            </li>
+            <li>
+                <div class="nav-item" data-tab="dashboard-tab">
                     <i class="fas fa-chart-pie"></i>
                     <span>Leadership Dashboard</span>
                 </div>
@@ -45,24 +51,17 @@
                 </div>
             </li>
             <li>
-                <div class="nav-item" data-tab="settings-tab">
-                    <i class="fas fa-file-import"></i>
-                    <span>Excel & Backups</span>
-                </div>
-            </li>
-            <li>
                 <div class="nav-item" data-tab="detailed-tab">
                     <i class="fas fa-diagram-project"></i>
                     <span>Detailed Overview</span>
                 </div>
             </li>
             <li>
-                <div class="nav-item" data-tab="aop-tab">
-                    <i class="fas fa-bullseye"></i>
-                    <span>AOP & Quarterly Plan</span>
+                <div class="nav-item" data-tab="settings-tab">
+                    <i class="fas fa-file-import"></i>
+                    <span>Excel & Backups</span>
                 </div>
             </li>
-
         </ul>
         
 
@@ -88,7 +87,7 @@
         </header>
 
         <!-- TAB 1: EXECUTIVE DASHBOARD -->
-        <section id="dashboard-tab" class="tab-panel active">
+        <section id="dashboard-tab" class="tab-panel">
             
             <!-- Executive Summary Text Box -->
             <div class="summary-card">
@@ -324,7 +323,7 @@
         </section>
 
         <!-- TAB 5: AOP & QUARTERLY PLANNING -->
-        <section id="aop-tab" class="tab-panel">
+        <section id="aop-tab" class="tab-panel active">
             <!-- Dynamically populated by app.js renderAopTab() -->
         </section>
 

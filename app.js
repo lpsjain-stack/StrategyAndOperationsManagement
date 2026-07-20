@@ -1657,6 +1657,7 @@ function renderAll() {
     updateSortIcons();
     filterAndRenderProjects();
     renderDetailedOverview();
+    renderAopTab();
 }
 
 // Modal Form handling
