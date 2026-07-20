@@ -2590,17 +2590,38 @@ window.switchQuarter = function(qId) {
     renderAopTab();
 };
 
-// Monthly CTO Executive Newsletter Logic & Compiler
+// Monthly CTO Executive Newsletter Logic & Compiler (Auto-Generated & Section Editable)
+let activeSectionEditing = null;
+
 function renderNewsletterTab() {
     const container = document.getElementById("newsletter-tab");
     if (!container) return;
+
+    appState.customNewsletterSections = appState.customNewsletterSections || {};
 
     // Find live linked projects
     const p1 = appState.projects.find(p => p.id === "p1" || p.name.includes("Wealth")) || appState.projects[0];
     const p2 = appState.projects.find(p => p.id === "p2" || p.name.includes("Cloud")) || appState.projects[1];
     const p3 = appState.projects.find(p => p.id === "p3" || p.name.includes("Compliance")) || appState.projects[2];
 
+    const custom = appState.customNewsletterSections;
+
     container.innerHTML = `
+        <!-- Auto-Generate & Reset Toolbar -->
+        <div class="newsletter-toolbar">
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; font-weight:700; color:var(--text-primary);">
+                <i class="fas fa-wand-magic-sparkles text-primary"></i> CTO Executive Newsletter Suite
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="triggerAutoGenerateNewsletter()" style="font-size:0.75rem; padding:0.4rem 0.85rem;">
+                    <i class="fas fa-bolt"></i> ⚡ Auto-Generate CTO Newsletter
+                </button>
+                <button class="btn btn-secondary" onclick="resetNewsletterToAutoDraft()" style="font-size:0.75rem; padding:0.4rem 0.85rem;">
+                    <i class="fas fa-rotate-left"></i> 🔄 Reset to Live Auto-Draft
+                </button>
+            </div>
+        </div>
+
         <div class="newsletter-wrapper">
             <!-- Header Bar -->
             <div class="newsletter-header">
@@ -2633,52 +2654,71 @@ function renderNewsletterTab() {
 
             <!-- Section 1: High-Frequency Trading (HFT) & Platform Performance -->
             <div class="newsletter-section">
-                <h3 class="newsletter-sec-title"><i class="fas fa-bolt text-primary"></i> 1. High-Frequency Trading (HFT) & Platform Performance</h3>
-                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0 0 0.75rem 0; line-height:1.5;">
-                    Our primary focus remains keeping order execution latency low and ensuring system stability during market opens and high-volatility events.
-                </p>
+                <div class="newsletter-sec-header">
+                    <h3 class="newsletter-sec-title" style="margin:0;"><i class="fas fa-bolt text-primary"></i> 1. High-Frequency Trading (HFT) & Platform Performance</h3>
+                    <button class="btn btn-secondary" onclick="editNewsletterSection('sec1')" style="font-size:0.7rem; padding:0.25rem 0.6rem;">
+                        <i class="fas fa-pen-to-square"></i> ✏️ Edit Section
+                    </button>
+                </div>
 
-                <table class="hft-table">
-                    <thead>
-                        <tr>
-                            <th>Metric</th>
-                            <th>Target</th>
-                            <th>June Actual</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Peak Orders Per Second (OPS)</strong></td>
-                            <td>—</td>
-                            <td><strong style="color:var(--text-primary);">12,500</strong></td>
-                            <td><span class="status-badge status-completed" style="font-size:0.7rem;">🚀 Record High</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Order Execution Latency (P99)</strong></td>
-                            <td>&lt; 15ms</td>
-                            <td><strong style="color:var(--status-ontrack);">11.2ms</strong></td>
-                            <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>API Gateway Availability</strong></td>
-                            <td>99.99%</td>
-                            <td><strong style="color:var(--status-ontrack);">99.992%</strong></td>
-                            <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>SmartAPI Error Rate</strong></td>
-                            <td>&lt; 0.05%</td>
-                            <td><strong style="color:var(--status-ontrack);">0.021%</strong></td>
-                            <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                ${activeSectionEditing === 'sec1' ? `
+                    <div class="newsletter-edit-box">
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.35rem;">Editing Section 1 Content:</div>
+                        <textarea id="edit_sec1" class="newsletter-textarea">${escapeHTML(custom.sec1 || "Handled a record 12,500 OPS during post-budget market opening on June 15. Core OMS processed all orders smoothly without queue backlog.\nLatency Optimization: Optimized Redis caching layers, cutting P99 order placement latency by 1.8ms across mobile and web platforms.")}</textarea>
+                        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="saveNewsletterSection('sec1')" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-floppy-disk"></i> 💾 Save Section</button>
+                            <button class="btn btn-secondary" onclick="cancelEditNewsletterSection()" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-xmark"></i> ✖ Cancel</button>
+                        </div>
+                    </div>
+                ` : `
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin:0 0 0.75rem 0; line-height:1.5;">
+                        Our primary focus remains keeping order execution latency low and ensuring system stability during market opens and high-volatility events.
+                    </p>
 
-                <ul class="newsletter-bullets">
-                    <li><strong>Peak Load Handling:</strong> Handled a record 12,500 OPS during the post-budget market opening on June 15. The core order management system (OMS) processed all orders smoothly without any queue backlog.</li>
-                    <li><strong>Latency Optimization:</strong> Optimized our Redis caching layers, which cut P99 order placement latency by 1.8ms across all mobile and web platforms.</li>
-                </ul>
+                    <table class="hft-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Target</th>
+                                <th>June Actual</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Peak Orders Per Second (OPS)</strong></td>
+                                <td>—</td>
+                                <td><strong style="color:var(--text-primary);">12,500</strong></td>
+                                <td><span class="status-badge status-completed" style="font-size:0.7rem;">🚀 Record High</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Order Execution Latency (P99)</strong></td>
+                                <td>&lt; 15ms</td>
+                                <td><strong style="color:var(--status-ontrack);">11.2ms</strong></td>
+                                <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>API Gateway Availability</strong></td>
+                                <td>99.99%</td>
+                                <td><strong style="color:var(--status-ontrack);">99.992%</strong></td>
+                                <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SmartAPI Error Rate</strong></td>
+                                <td>&lt; 0.05%</td>
+                                <td><strong style="color:var(--status-ontrack);">0.021%</strong></td>
+                                <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <ul class="newsletter-bullets">
+                        ${custom.sec1 ? custom.sec1.split('\n').map(line => `<li>${escapeHTML(line)}</li>`).join('') : `
+                            <li><strong>Peak Load Handling:</strong> Handled a record 12,500 OPS during the post-budget market opening on June 15. The core order management system (OMS) processed all orders smoothly without any queue backlog.</li>
+                            <li><strong>Latency Optimization:</strong> Optimized our Redis caching layers, which cut P99 order placement latency by 1.8ms across all mobile and web platforms.</li>
+                        `}
+                    </ul>
+                `}
 
                 ${p2 ? `
                     <div style="margin-top:0.75rem;">
@@ -2691,25 +2731,44 @@ function renderNewsletterTab() {
 
             <!-- Section 2: Infrastructure Scale & Cloud Cost Optimization -->
             <div class="newsletter-section">
-                <h3 class="newsletter-sec-title"><i class="fas fa-server text-primary"></i> 2. Infrastructure Scale & Cloud Cost Optimization</h3>
-                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
-                    We continue to scale our hybrid cloud setup while keeping a close eye on budget efficiency.
-                </p>
-
-                <ul class="newsletter-bullets">
-                    <li><strong>Database Migration:</strong> Successfully shifted 40% of our historical ledger data to an offline cold storage system. This reduced our active database load and cut primary database storage costs by 14%.</li>
-                    <li><strong>Cloud Spend FinOps:</strong> Cleaned up unused dev/staging environments and set up automated scaling rules for Kubernetes clusters. This saved $42,000 in cloud costs this month.</li>
-                </ul>
-
-                <div class="finops-budget-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; font-size:0.82rem;">
-                        <strong style="color:var(--text-primary);"><i class="fas fa-chart-pie text-primary"></i> Monthly Cloud Budget Track</strong>
-                        <span style="color:var(--status-ontrack); font-weight:700;">[████████████████░░░░] 82% of Monthly Budget Expended</span>
-                    </div>
-                    <div style="height:8px; background:var(--border-color); border-radius:4px; overflow:hidden;">
-                        <div style="width:82%; background:linear-gradient(90deg, var(--primary), var(--status-ontrack)); height:100%;"></div>
-                    </div>
+                <div class="newsletter-sec-header">
+                    <h3 class="newsletter-sec-title" style="margin:0;"><i class="fas fa-server text-primary"></i> 2. Infrastructure Scale & Cloud Cost Optimization</h3>
+                    <button class="btn btn-secondary" onclick="editNewsletterSection('sec2')" style="font-size:0.7rem; padding:0.25rem 0.6rem;">
+                        <i class="fas fa-pen-to-square"></i> ✏️ Edit Section
+                    </button>
                 </div>
+
+                ${activeSectionEditing === 'sec2' ? `
+                    <div class="newsletter-edit-box">
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.35rem;">Editing Section 2 Content:</div>
+                        <textarea id="edit_sec2" class="newsletter-textarea">${escapeHTML(custom.sec2 || "Database Migration: Successfully shifted 40% of historical ledger data to offline cold storage, cutting primary DB costs by 14%.\nCloud Spend FinOps: Cleaned up unused dev/staging environments and automated scaling rules for Kubernetes clusters, saving $42,000 in cloud costs this month.")}</textarea>
+                        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="saveNewsletterSection('sec2')" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-floppy-disk"></i> 💾 Save Section</button>
+                            <button class="btn btn-secondary" onclick="cancelEditNewsletterSection()" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-xmark"></i> ✖ Cancel</button>
+                        </div>
+                    </div>
+                ` : `
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
+                        We continue to scale our hybrid cloud setup while keeping a close eye on budget efficiency.
+                    </p>
+
+                    <ul class="newsletter-bullets">
+                        ${custom.sec2 ? custom.sec2.split('\n').map(line => `<li>${escapeHTML(line)}</li>`).join('') : `
+                            <li><strong>Database Migration:</strong> Successfully shifted 40% of our historical ledger data to an offline cold storage system. This reduced our active database load and cut primary database storage costs by 14%.</li>
+                            <li><strong>Cloud Spend FinOps:</strong> Cleaned up unused dev/staging environments and set up automated scaling rules for Kubernetes clusters. This saved $42,000 in cloud costs this month.</li>
+                        `}
+                    </ul>
+
+                    <div class="finops-budget-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; font-size:0.82rem;">
+                            <strong style="color:var(--text-primary);"><i class="fas fa-chart-pie text-primary"></i> Monthly Cloud Budget Track</strong>
+                            <span style="color:var(--status-ontrack); font-weight:700;">[████████████████░░░░] 82% of Monthly Budget Expended</span>
+                        </div>
+                        <div style="height:8px; background:var(--border-color); border-radius:4px; overflow:hidden;">
+                            <div style="width:82%; background:linear-gradient(90deg, var(--primary), var(--status-ontrack)); height:100%;"></div>
+                        </div>
+                    </div>
+                `}
 
                 ${p2 ? `
                     <div style="margin-top:0.75rem;">
@@ -2722,41 +2781,83 @@ function renderNewsletterTab() {
 
             <!-- Section 3: Engineering Velocity & DevOps -->
             <div class="newsletter-section">
-                <h3 class="newsletter-sec-title"><i class="fas fa-code-branch text-primary"></i> 3. Engineering Velocity & DevOps</h3>
-                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
-                    This section tracks how quickly we are delivering software and the health of our deployment pipelines.
-                </p>
-
-                <div class="velocity-grid">
-                    <div class="velocity-box">
-                        <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Deployment Frequency</span>
-                        <span style="font-size:1.35rem; font-weight:800; color:var(--text-primary);">142 Production Changes</span>
-                        <span style="font-size:0.75rem; color:var(--status-ontrack);"><i class="fas fa-circle-check"></i> 100% Automated CI/CD</span>
-                    </div>
-                    <div class="velocity-box">
-                        <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Change Failure Rate (CFR)</span>
-                        <span style="font-size:1.35rem; font-weight:800; color:var(--status-ontrack);">0.7%</span>
-                        <span style="font-size:0.75rem; color:var(--text-secondary);"><i class="fas fa-arrow-down" style="color:var(--status-ontrack);"></i> Down from 1.4% last month</span>
-                    </div>
-                    <div class="velocity-box">
-                        <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Mean Time to Repair (MTTR)</span>
-                        <span style="font-size:1.35rem; font-weight:800; color:var(--primary);">8 Minutes</span>
-                        <span style="font-size:0.75rem; color:var(--status-ontrack);"><i class="fas fa-shield"></i> Well below 15-min SLA</span>
-                    </div>
+                <div class="newsletter-sec-header">
+                    <h3 class="newsletter-sec-title" style="margin:0;"><i class="fas fa-code-branch text-primary"></i> 3. Engineering Velocity & DevOps</h3>
+                    <button class="btn btn-secondary" onclick="editNewsletterSection('sec3')" style="font-size:0.7rem; padding:0.25rem 0.6rem;">
+                        <i class="fas fa-pen-to-square"></i> ✏️ Edit Section
+                    </button>
                 </div>
+
+                ${activeSectionEditing === 'sec3' ? `
+                    <div class="newsletter-edit-box">
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.35rem;">Editing Section 3 Content:</div>
+                        <textarea id="edit_sec3" class="newsletter-textarea">${escapeHTML(custom.sec3 || "Deployment Frequency: Deployed 142 successful production changes this month.\nChange Failure Rate (CFR): Dropped to 0.7% thanks to stricter automated smoke tests in pre-production pipeline.\nMean Time to Repair (MTTR): Averaged 8 minutes for minor production issues, well below our 15-minute SLA limit.")}</textarea>
+                        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="saveNewsletterSection('sec3')" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-floppy-disk"></i> 💾 Save Section</button>
+                            <button class="btn btn-secondary" onclick="cancelEditNewsletterSection()" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-xmark"></i> ✖ Cancel</button>
+                        </div>
+                    </div>
+                ` : `
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
+                        This section tracks how quickly we are delivering software and the health of our deployment pipelines.
+                    </p>
+
+                    ${custom.sec3 ? `
+                        <ul class="newsletter-bullets">
+                            ${custom.sec3.split('\n').map(line => `<li>${escapeHTML(line)}</li>`).join('')}
+                        </ul>
+                    ` : `
+                        <div class="velocity-grid">
+                            <div class="velocity-box">
+                                <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Deployment Frequency</span>
+                                <span style="font-size:1.35rem; font-weight:800; color:var(--text-primary);">142 Production Changes</span>
+                                <span style="font-size:0.75rem; color:var(--status-ontrack);"><i class="fas fa-circle-check"></i> 100% Automated CI/CD</span>
+                            </div>
+                            <div class="velocity-box">
+                                <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Change Failure Rate (CFR)</span>
+                                <span style="font-size:1.35rem; font-weight:800; color:var(--status-ontrack);">0.7%</span>
+                                <span style="font-size:0.75rem; color:var(--text-secondary);"><i class="fas fa-arrow-down" style="color:var(--status-ontrack);"></i> Down from 1.4% last month</span>
+                            </div>
+                            <div class="velocity-box">
+                                <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Mean Time to Repair (MTTR)</span>
+                                <span style="font-size:1.35rem; font-weight:800; color:var(--primary);">8 Minutes</span>
+                                <span style="font-size:0.75rem; color:var(--status-ontrack);"><i class="fas fa-shield"></i> Well below 15-min SLA</span>
+                            </div>
+                        </div>
+                    `}
+                `}
             </div>
 
             <!-- Section 4: Cyber Security, Risk & Compliance -->
             <div class="newsletter-section">
-                <h3 class="newsletter-sec-title"><i class="fas fa-shield-halved text-primary"></i> 4. Cyber Security, Risk & Compliance</h3>
-                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
-                    We have updated our systems to align with the latest regulatory and data security requirements.
-                </p>
+                <div class="newsletter-sec-header">
+                    <h3 class="newsletter-sec-title" style="margin:0;"><i class="fas fa-shield-halved text-primary"></i> 4. Cyber Security, Risk & Compliance</h3>
+                    <button class="btn btn-secondary" onclick="editNewsletterSection('sec4')" style="font-size:0.7rem; padding:0.25rem 0.6rem;">
+                        <i class="fas fa-pen-to-square"></i> ✏️ Edit Section
+                    </button>
+                </div>
 
-                <ul class="newsletter-bullets">
-                    <li><strong>SEBI Cyber Security Framework:</strong> Patched and updated all internet-facing APIs to meet the new SEBI guidelines for multi-factor authentication (MFA) on third-party integrations.</li>
-                    <li><strong>Vulnerability Management:</strong> Completed our monthly automated VPTA (Vulnerability Assessment and Penetration Testing) scan. Critical bugs found: <strong>0</strong>; Medium risk bugs found: <strong>3</strong> (all 3 are already patched).</li>
-                </ul>
+                ${activeSectionEditing === 'sec4' ? `
+                    <div class="newsletter-edit-box">
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.35rem;">Editing Section 4 Content:</div>
+                        <textarea id="edit_sec4" class="newsletter-textarea">${escapeHTML(custom.sec4 || "SEBI Cyber Security Framework: Patched and updated all internet-facing APIs to meet new SEBI guidelines for MFA on third-party integrations.\nVulnerability Management: Completed monthly automated VPTA scan. Critical bugs: 0; Medium risk bugs: 3 (all 3 patched).")}</textarea>
+                        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="saveNewsletterSection('sec4')" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-floppy-disk"></i> 💾 Save Section</button>
+                            <button class="btn btn-secondary" onclick="cancelEditNewsletterSection()" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-xmark"></i> ✖ Cancel</button>
+                        </div>
+                    </div>
+                ` : `
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
+                        We have updated our systems to align with the latest regulatory and data security requirements.
+                    </p>
+
+                    <ul class="newsletter-bullets">
+                        ${custom.sec4 ? custom.sec4.split('\n').map(line => `<li>${escapeHTML(line)}</li>`).join('') : `
+                            <li><strong>SEBI Cyber Security Framework:</strong> Patched and updated all internet-facing APIs to meet the new SEBI guidelines for multi-factor authentication (MFA) on third-party integrations.</li>
+                            <li><strong>Vulnerability Management:</strong> Completed our monthly automated VPTA (Vulnerability Assessment and Penetration Testing) scan. Critical bugs found: <strong>0</strong>; Medium risk bugs found: <strong>3</strong> (all 3 are already patched).</li>
+                        `}
+                    </ul>
+                `}
 
                 ${p3 ? `
                     <div style="margin-top:0.75rem;">
@@ -2769,27 +2870,61 @@ function renderNewsletterTab() {
 
             <!-- Section 5: Data Engineering & AI Initiatives -->
             <div class="newsletter-section">
-                <h3 class="newsletter-sec-title"><i class="fas fa-brain text-primary"></i> 5. Data Engineering & AI Initiatives</h3>
+                <div class="newsletter-sec-header">
+                    <h3 class="newsletter-sec-title" style="margin:0;"><i class="fas fa-brain text-primary"></i> 5. Data Engineering & AI Initiatives</h3>
+                    <button class="btn btn-secondary" onclick="editNewsletterSection('sec5')" style="font-size:0.7rem; padding:0.25rem 0.6rem;">
+                        <i class="fas fa-pen-to-square"></i> ✏️ Edit Section
+                    </button>
+                </div>
 
-                <ul class="newsletter-bullets">
-                    <li><strong>Real-time Fraud Alerts:</strong> Deployed a new machine learning model to detect anomalies in options trading. The model successfully flagged two accounts showing irregular, high-frequency wash trading patterns.</li>
-                    <li><strong>Data Pipeline Speed:</strong> Upgraded our Apache Kafka cluster infrastructure. This cut the time it takes to sync trading data into our marketing tools from 4 minutes down to less than 30 seconds.</li>
-                </ul>
+                ${activeSectionEditing === 'sec5' ? `
+                    <div class="newsletter-edit-box">
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.35rem;">Editing Section 5 Content:</div>
+                        <textarea id="edit_sec5" class="newsletter-textarea">${escapeHTML(custom.sec5 || "Real-time Fraud Alerts: Deployed machine learning model to detect anomalies in options trading. Flagged two accounts showing irregular wash trading patterns.\nData Pipeline Speed: Upgraded Apache Kafka cluster, cutting time to sync trading data into marketing tools from 4 mins to <30 seconds.")}</textarea>
+                        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="saveNewsletterSection('sec5')" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-floppy-disk"></i> 💾 Save Section</button>
+                            <button class="btn btn-secondary" onclick="cancelEditNewsletterSection()" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-xmark"></i> ✖ Cancel</button>
+                        </div>
+                    </div>
+                ` : `
+                    <ul class="newsletter-bullets">
+                        ${custom.sec5 ? custom.sec5.split('\n').map(line => `<li>${escapeHTML(line)}</li>`).join('') : `
+                            <li><strong>Real-time Fraud Alerts:</strong> Deployed a new machine learning model to detect anomalies in options trading. The model successfully flagged two accounts showing irregular, high-frequency wash trading patterns.</li>
+                            <li><strong>Data Pipeline Speed:</strong> Upgraded our Apache Kafka cluster infrastructure. This cut the time it takes to sync trading data into our marketing tools from 4 minutes down to less than 30 seconds.</li>
+                        `}
+                    </ul>
+                `}
             </div>
 
             <!-- Section 6: Critical Blockers & CTO Attention Required -->
             <div class="newsletter-section">
-                <h3 class="newsletter-sec-title"><i class="fas fa-triangle-exclamation text-primary" style="color:var(--status-delayed);"></i> 6. Critical Blockers & CTO Attention Required</h3>
-
-                <div class="blocker-alert-card">
-                    <h4><i class="fas fa-building-columns"></i> Third-Party Bank Outages</h4>
-                    <p style="font-size:0.85rem; color:var(--text-primary); margin:0 0 0.5rem 0; line-height:1.4;">
-                        We experienced brief payment gateway slowdowns from two partner banks during peak hours this month.
-                    </p>
-                    <div style="font-size:0.8rem; background-color:rgba(0,0,0,0.2); padding:0.5rem 0.75rem; border-radius:0.4rem; color:var(--text-secondary);">
-                        <strong style="color:var(--status-delayed);"><i class="fas fa-thumbtack"></i> Action Item:</strong> We need to accelerate our project to integrate a third backup bank gateway by next month to spread out the transaction load.
-                    </div>
+                <div class="newsletter-sec-header">
+                    <h3 class="newsletter-sec-title" style="margin:0;"><i class="fas fa-triangle-exclamation text-primary" style="color:var(--status-delayed);"></i> 6. Critical Blockers & CTO Attention Required</h3>
+                    <button class="btn btn-secondary" onclick="editNewsletterSection('sec6')" style="font-size:0.7rem; padding:0.25rem 0.6rem;">
+                        <i class="fas fa-pen-to-square"></i> ✏️ Edit Section
+                    </button>
                 </div>
+
+                ${activeSectionEditing === 'sec6' ? `
+                    <div class="newsletter-edit-box">
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.35rem;">Editing Section 6 Content:</div>
+                        <textarea id="edit_sec6" class="newsletter-textarea">${escapeHTML(custom.sec6 || "Third-Party Bank Outages: Experienced brief payment gateway slowdowns from two partner banks during peak hours.\nAction Item: Accelerate project to integrate a third backup bank gateway by next month to spread out transaction load.")}</textarea>
+                        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="saveNewsletterSection('sec6')" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-floppy-disk"></i> 💾 Save Section</button>
+                            <button class="btn btn-secondary" onclick="cancelEditNewsletterSection()" style="font-size:0.75rem; padding:0.3rem 0.75rem;"><i class="fas fa-xmark"></i> ✖ Cancel</button>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="blocker-alert-card">
+                        <h4><i class="fas fa-building-columns"></i> Third-Party Bank Outages & Risk Factors</h4>
+                        <p style="font-size:0.85rem; color:var(--text-primary); margin:0 0 0.5rem 0; line-height:1.4;">
+                            ${custom.sec6 ? escapeHTML(custom.sec6) : "We experienced brief payment gateway slowdowns from two partner banks during peak hours this month."}
+                        </p>
+                        <div style="font-size:0.8rem; background-color:rgba(0,0,0,0.2); padding:0.5rem 0.75rem; border-radius:0.4rem; color:var(--text-secondary);">
+                            <strong style="color:var(--status-delayed);"><i class="fas fa-thumbtack"></i> Action Item:</strong> Accelerate project to integrate a third backup bank gateway by next month to spread out transaction load.
+                        </div>
+                    </div>
+                `}
 
                 ${p1 ? `
                     <div style="margin-top:0.75rem;">
@@ -2828,6 +2963,58 @@ function renderNewsletterTab() {
         </div>
     `;
 }
+
+window.triggerAutoGenerateNewsletter = function() {
+    // Generate fresh summary text from current active projects
+    const totalProjects = appState.projects.length;
+    const atRiskProjects = appState.projects.filter(p => p.status === "At Risk" || p.status === "Delayed");
+    const riskText = atRiskProjects.length > 0 
+        ? atRiskProjects.map(p => `${p.name}: ${p.riskDesc || "Risk identified in milestones."}`).join("; ")
+        : "All projects currently operating within risk thresholds.";
+
+    appState.customNewsletterSections = {
+        sec1: `Peak Load Handling: Processed high trading volume across ${totalProjects} active projects smoothly.\nLatency Optimization: Redis caching and gateway route optimization cut P99 order latency across mobile and web platforms.`,
+        sec2: `Database Migration: Shifted historical ledger data to cold storage, reducing active DB load.\nCloud Spend FinOps: Optimized K8s cluster auto-scaling, saving $42,000 in monthly cloud infrastructure costs.`,
+        sec3: `Deployment Frequency: 142 successful production changes deployed.\nChange Failure Rate: Maintained at 0.7% with automated pre-production smoke test coverage.\nMTTR: 8 minutes SLA average.`,
+        sec4: `SEBI Framework: Internet-facing APIs updated for SEBI MFA compliance.\nVulnerability Management: 0 Critical, 3 Medium vulnerabilities identified and 100% patched.`,
+        sec5: `Real-time Fraud Alerts: ML anomaly detection model operational across options trading.\nData Pipeline: Kafka cluster sync time optimized to under 30 seconds.`,
+        sec6: `Active Portfolio Risk Alert: ${riskText}`
+    };
+
+    saveState();
+    showToast("⚡ CTO Newsletter auto-generated from live project data!", "success");
+    renderNewsletterTab();
+};
+
+window.resetNewsletterToAutoDraft = function() {
+    appState.customNewsletterSections = {};
+    activeSectionEditing = null;
+    saveState();
+    showToast("🔄 Newsletter reset to live auto-draft.", "info");
+    renderNewsletterTab();
+};
+
+window.editNewsletterSection = function(secId) {
+    activeSectionEditing = secId;
+    renderNewsletterTab();
+};
+
+window.saveNewsletterSection = function(secId) {
+    const textarea = document.getElementById(`edit_${secId}`);
+    if (textarea) {
+        appState.customNewsletterSections = appState.customNewsletterSections || {};
+        appState.customNewsletterSections[secId] = textarea.value;
+        saveState();
+        showToast("Section updated and saved.", "success");
+    }
+    activeSectionEditing = null;
+    renderNewsletterTab();
+};
+
+window.cancelEditNewsletterSection = function() {
+    activeSectionEditing = null;
+    renderNewsletterTab();
+};
 
 window.submitNewsletterFeedback = function() {
     alert("Feedback saved! The Engineering Excellence & Architecture Group will customize next month's update accordingly.");

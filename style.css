@@ -1955,6 +1955,56 @@ body {
     animation: highlightPulse 2s ease-in-out 1;
 }
 
+/* Newsletter Toolbar & Section Editing Styles */
+.newsletter-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.newsletter-sec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.85rem;
+}
+
+.newsletter-edit-box {
+    background-color: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--primary);
+    border-radius: 0.65rem;
+    padding: 1rem;
+    margin-top: 0.5rem;
+}
+
+.newsletter-textarea {
+    width: 100%;
+    min-height: 120px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    padding: 0.75rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.newsletter-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+
 
 
 
