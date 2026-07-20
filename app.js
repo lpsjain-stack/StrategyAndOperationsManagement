@@ -697,6 +697,8 @@ function setupEventListeners() {
                 renderDetailedOverview();
             } else if (tabId === "aop-tab") {
                 renderAopTab();
+            } else if (tabId === "newsletter-tab") {
+                renderNewsletterTab();
             }
         });
     });
@@ -1658,6 +1660,7 @@ function renderAll() {
     filterAndRenderProjects();
     renderDetailedOverview();
     renderAopTab();
+    renderNewsletterTab();
 }
 
 // Modal Form handling
@@ -2537,4 +2540,210 @@ function renderAopTab() {
 window.switchQuarter = function(qId) {
     currentQuarterFilter = qId;
     renderAopTab();
+};
+
+// Monthly CTO Executive Newsletter Logic & Compiler
+function renderNewsletterTab() {
+    const container = document.getElementById("newsletter-tab");
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="newsletter-wrapper">
+            <!-- Header Bar -->
+            <div class="newsletter-header">
+                <div class="newsletter-title-bar">
+                    <h2><i class="fas fa-newspaper text-primary"></i> 📈 Angel One Tech Pulse | Monthly Executive Update</h2>
+                    <span class="status-badge status-completed" style="font-size:0.75rem; padding:0.35rem 0.75rem;">
+                        <i class="fas fa-paper-plane"></i> Published & Distributed
+                    </span>
+                </div>
+                
+                <div class="newsletter-meta-grid">
+                    <div class="newsletter-meta-item">
+                        <strong>To:</strong>
+                        <span>Chief Technology Officer</span>
+                    </div>
+                    <div class="newsletter-meta-item">
+                        <strong>From:</strong>
+                        <span>Engineering Excellence & Architecture Group</span>
+                    </div>
+                    <div class="newsletter-meta-item">
+                        <strong>Reporting Period:</strong>
+                        <span>June 2026</span>
+                    </div>
+                    <div class="newsletter-meta-item">
+                        <strong>Governance Status:</strong>
+                        <span style="color:var(--status-ontrack);"><i class="fas fa-circle-check"></i> Executive Sign-off</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: High-Frequency Trading (HFT) & Platform Performance -->
+            <div class="newsletter-section">
+                <h3 class="newsletter-sec-title"><i class="fas fa-bolt text-primary"></i> 1. High-Frequency Trading (HFT) & Platform Performance</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0 0 0.75rem 0; line-height:1.5;">
+                    Our primary focus remains keeping order execution latency low and ensuring system stability during market opens and high-volatility events.
+                </p>
+
+                <table class="hft-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Target</th>
+                            <th>June Actual</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Peak Orders Per Second (OPS)</strong></td>
+                            <td>—</td>
+                            <td><strong style="color:var(--text-primary);">12,500</strong></td>
+                            <td><span class="status-badge status-completed" style="font-size:0.7rem;">🚀 Record High</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Order Execution Latency (P99)</strong></td>
+                            <td>&lt; 15ms</td>
+                            <td><strong style="color:var(--status-ontrack);">11.2ms</strong></td>
+                            <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>API Gateway Availability</strong></td>
+                            <td>99.99%</td>
+                            <td><strong style="color:var(--status-ontrack);">99.992%</strong></td>
+                            <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>SmartAPI Error Rate</strong></td>
+                            <td>&lt; 0.05%</td>
+                            <td><strong style="color:var(--status-ontrack);">0.021%</strong></td>
+                            <td><span class="status-badge status-ontrack" style="font-size:0.7rem;">🟢 Healthy</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <ul class="newsletter-bullets">
+                    <li><strong>Peak Load Handling:</strong> Handled a record 12,500 OPS during the post-budget market opening on June 15. The core order management system (OMS) processed all orders smoothly without any queue backlog.</li>
+                    <li><strong>Latency Optimization:</strong> Optimized our Redis caching layers, which cut P99 order placement latency by 1.8ms across all mobile and web platforms.</li>
+                </ul>
+            </div>
+
+            <!-- Section 2: Infrastructure Scale & Cloud Cost Optimization -->
+            <div class="newsletter-section">
+                <h3 class="newsletter-sec-title"><i class="fas fa-server text-primary"></i> 2. Infrastructure Scale & Cloud Cost Optimization</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
+                    We continue to scale our hybrid cloud setup while keeping a close eye on budget efficiency.
+                </p>
+
+                <ul class="newsletter-bullets">
+                    <li><strong>Database Migration:</strong> Successfully shifted 40% of our historical ledger data to an offline cold storage system. This reduced our active database load and cut primary database storage costs by 14%.</li>
+                    <li><strong>Cloud Spend FinOps:</strong> Cleaned up unused dev/staging environments and set up automated scaling rules for Kubernetes clusters. This saved $42,000 in cloud costs this month.</li>
+                </ul>
+
+                <div class="finops-budget-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; font-size:0.82rem;">
+                        <strong style="color:var(--text-primary);"><i class="fas fa-chart-pie text-primary"></i> Monthly Cloud Budget Track</strong>
+                        <span style="color:var(--status-ontrack); font-weight:700;">[████████████████░░░░] 82% of Monthly Budget Expended</span>
+                    </div>
+                    <div style="height:8px; background:var(--border-color); border-radius:4px; overflow:hidden;">
+                        <div style="width:82%; background:linear-gradient(90deg, var(--primary), var(--status-ontrack)); height:100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Engineering Velocity & DevOps -->
+            <div class="newsletter-section">
+                <h3 class="newsletter-sec-title"><i class="fas fa-code-branch text-primary"></i> 3. Engineering Velocity & DevOps</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
+                    This section tracks how quickly we are delivering software and the health of our deployment pipelines.
+                </p>
+
+                <div class="velocity-grid">
+                    <div class="velocity-box">
+                        <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Deployment Frequency</span>
+                        <span style="font-size:1.35rem; font-weight:800; color:var(--text-primary);">142 Production Changes</span>
+                        <span style="font-size:0.75rem; color:var(--status-ontrack);"><i class="fas fa-circle-check"></i> 100% Automated CI/CD</span>
+                    </div>
+                    <div class="velocity-box">
+                        <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Change Failure Rate (CFR)</span>
+                        <span style="font-size:1.35rem; font-weight:800; color:var(--status-ontrack);">0.7%</span>
+                        <span style="font-size:0.75rem; color:var(--text-secondary);"><i class="fas fa-arrow-down" style="color:var(--status-ontrack);"></i> Down from 1.4% last month</span>
+                    </div>
+                    <div class="velocity-box">
+                        <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Mean Time to Repair (MTTR)</span>
+                        <span style="font-size:1.35rem; font-weight:800; color:var(--primary);">8 Minutes</span>
+                        <span style="font-size:0.75rem; color:var(--status-ontrack);"><i class="fas fa-shield"></i> Well below 15-min SLA</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Cyber Security, Risk & Compliance -->
+            <div class="newsletter-section">
+                <h3 class="newsletter-sec-title"><i class="fas fa-shield-halved text-primary"></i> 4. Cyber Security, Risk & Compliance</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin:0; line-height:1.5;">
+                    We have updated our systems to align with the latest regulatory and data security requirements.
+                </p>
+
+                <ul class="newsletter-bullets">
+                    <li><strong>SEBI Cyber Security Framework:</strong> Patched and updated all internet-facing APIs to meet the new SEBI guidelines for multi-factor authentication (MFA) on third-party integrations.</li>
+                    <li><strong>Vulnerability Management:</strong> Completed our monthly automated VPTA (Vulnerability Assessment and Penetration Testing) scan. Critical bugs found: <strong>0</strong>; Medium risk bugs found: <strong>3</strong> (all 3 are already patched).</li>
+                </ul>
+            </div>
+
+            <!-- Section 5: Data Engineering & AI Initiatives -->
+            <div class="newsletter-section">
+                <h3 class="newsletter-sec-title"><i class="fas fa-brain text-primary"></i> 5. Data Engineering & AI Initiatives</h3>
+
+                <ul class="newsletter-bullets">
+                    <li><strong>Real-time Fraud Alerts:</strong> Deployed a new machine learning model to detect anomalies in options trading. The model successfully flagged two accounts showing irregular, high-frequency wash trading patterns.</li>
+                    <li><strong>Data Pipeline Speed:</strong> Upgraded our Apache Kafka cluster infrastructure. This cut the time it takes to sync trading data into our marketing tools from 4 minutes down to less than 30 seconds.</li>
+                </ul>
+            </div>
+
+            <!-- Section 6: Critical Blockers & CTO Attention Required -->
+            <div class="newsletter-section">
+                <h3 class="newsletter-sec-title"><i class="fas fa-triangle-exclamation text-primary" style="color:var(--status-delayed);"></i> 6. Critical Blockers & CTO Attention Required</h3>
+
+                <div class="blocker-alert-card">
+                    <h4><i class="fas fa-building-columns"></i> Third-Party Bank Outages</h4>
+                    <p style="font-size:0.85rem; color:var(--text-primary); margin:0 0 0.5rem 0; line-height:1.4;">
+                        We experienced brief payment gateway slowdowns from two partner banks during peak hours this month.
+                    </p>
+                    <div style="font-size:0.8rem; background-color:rgba(0,0,0,0.2); padding:0.5rem 0.75rem; border-radius:0.4rem; color:var(--text-secondary);">
+                        <strong style="color:var(--status-delayed);"><i class="fas fa-thumbtack"></i> Action Item:</strong> We need to accelerate our project to integrate a third backup bank gateway by next month to spread out the transaction load.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 7: CTO Customization & Feedback Callout -->
+            <div class="feedback-card">
+                <h4 style="margin:0 0 0.5rem 0; color:var(--primary); font-size:0.95rem; font-weight:800; display:flex; align-items:center; gap:0.5rem;">
+                    <i class="fas fa-sliders"></i> Customize Next Month's Draft Options
+                </h4>
+                <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 1rem 0;">
+                    Please let us know if you would like to tailor future executive updates:
+                </p>
+
+                <div style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.82rem; color:var(--text-primary); margin-bottom:1rem;">
+                    <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                        <input type="checkbox" id="chkLending" style="accent-color:var(--primary);"> Focus more on lending and margin product updates
+                    </label>
+                    <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                        <input type="checkbox" id="chkBilling" style="accent-color:var(--primary);"> Add specific brokerage billing metrics
+                    </label>
+                    <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                        <input type="checkbox" id="chkTone" style="accent-color:var(--primary);"> Rewrite in a different design style or tone
+                    </label>
+                </div>
+
+                <button class="btn btn-primary" onclick="submitNewsletterFeedback()" style="font-size:0.8rem;">
+                    <i class="fas fa-paper-plane"></i> Save Executive Feedback Preferences
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+window.submitNewsletterFeedback = function() {
+    alert("Feedback saved! The Engineering Excellence & Architecture Group will customize next month's update accordingly.");
 };

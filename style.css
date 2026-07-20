@@ -1728,4 +1728,188 @@ body {
     flex-wrap: wrap;
 }
 
+/* Monthly CTO Executive Newsletter Styles */
+.newsletter-wrapper {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
+}
+
+.newsletter-header {
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+.newsletter-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.newsletter-title-bar h2 {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.newsletter-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 0.65rem;
+    padding: 0.85rem 1.25rem;
+    font-size: 0.82rem;
+}
+
+.newsletter-meta-item strong {
+    color: var(--text-muted);
+    font-weight: 600;
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.15rem;
+}
+
+.newsletter-meta-item span {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.newsletter-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.newsletter-section:last-child {
+    border-bottom: none;
+}
+
+.newsletter-sec-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-left: 3px solid var(--primary);
+    padding-left: 0.65rem;
+}
+
+.newsletter-bullets {
+    margin: 1rem 0 0 0;
+    padding-left: 1.25rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.newsletter-bullets li {
+    margin-bottom: 0.5rem;
+}
+
+.newsletter-bullets li strong {
+    color: var(--text-primary);
+}
+
+.hft-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-top: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.hft-table th {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.hft-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+}
+
+.hft-table tr:last-child td {
+    border-bottom: none;
+}
+
+.finops-budget-card {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-top: 1rem;
+}
+
+.velocity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1rem;
+}
+
+.velocity-box {
+    background-color: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    border-radius: 0.65rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.blocker-alert-card {
+    background-color: rgba(239, 68, 68, 0.08);
+    border-left: 4px solid var(--status-delayed);
+    border-radius: 0.65rem;
+    padding: 1.25rem;
+    margin-top: 0.75rem;
+}
+
+.blocker-alert-card h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--status-delayed);
+    font-size: 0.95rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.feedback-card {
+    background-color: rgba(99, 102, 241, 0.05);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 0.85rem;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+
 
